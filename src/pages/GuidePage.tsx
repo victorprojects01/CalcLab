@@ -16,7 +16,6 @@ import {
   Printer,
   FileSpreadsheet,
 } from 'lucide-react';
-import { AdSenseUnit } from '../components/AdSenseUnit';
 
 interface GuidePageProps {
   onNavigateToCalculator: () => void;
@@ -40,15 +39,6 @@ export const GuidePage: React.FC<GuidePageProps> = ({ onNavigateToCalculator }) 
           <Clock className="w-3.5 h-3.5" />
           <span>Tempo de leitura: ~6 min</span>
         </div>
-      </div>
-
-      {/* Bloco de Anúncio Superior (AdSense) */}
-      <div className="mb-8">
-        <AdSenseUnit
-          slotId={import.meta.env.VITE_ADSENSE_SLOT_TOP || 'adsense-guia-topo'}
-          format="horizontal"
-          label="Publicidade • Google AdSense"
-        />
       </div>
 
       {/* Cabeçalho da Página */}
@@ -111,15 +101,6 @@ export const GuidePage: React.FC<GuidePageProps> = ({ onNavigateToCalculator }) 
             </ul>
           </div>
         </section>
-
-        {/* Bloco de Anúncio Intermediário */}
-        <div className="my-8">
-          <AdSenseUnit
-            slotId={import.meta.env.VITE_ADSENSE_SLOT_INLINE || 'adsense-guia-meio'}
-            format="auto"
-            label="Publicidade"
-          />
-        </div>
 
         {/* Seção 3: Pilar 2 - Energia Elétrica */}
         <section className="space-y-4">
@@ -260,15 +241,6 @@ export const GuidePage: React.FC<GuidePageProps> = ({ onNavigateToCalculator }) 
           </button>
         </div>
       </article>
-
-      {/* Bloco de Anúncio Rodapé */}
-      <div className="mt-10">
-        <AdSenseUnit
-          slotId={import.meta.env.VITE_ADSENSE_SLOT_FOOTER || 'adsense-guia-rodape'}
-          format="auto"
-          label="Publicidade"
-        />
-      </div>
     </div>
   );
 };

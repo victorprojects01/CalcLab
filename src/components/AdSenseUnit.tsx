@@ -28,13 +28,13 @@ export const AdSenseUnit: React.FC<AdSenseUnitProps> = ({
   const adRef = useRef<HTMLModElement | null>(null);
   const isPushed = useRef(false);
 
-  // Lê o Publisher ID da variável de ambiente ou fallback de configuração
+  // Lê o Publisher ID da variável de ambiente ou fallback com o ID oficial
   const clientId =
     (import.meta.env.VITE_ADSENSE_CLIENT_ID as string) ||
-    'ca-pub-0000000000000000';
+    'ca-pub-6239237268971394';
 
   const isConfigured =
-    clientId &&
+    Boolean(clientId) &&
     clientId !== 'ca-pub-0000000000000000' &&
     !clientId.includes('XXXX');
 

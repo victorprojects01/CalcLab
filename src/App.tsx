@@ -28,7 +28,6 @@ import { PrinterAndFilamentSection } from './components/PrinterAndFilamentSectio
 import { AccessoriesSection } from './components/AccessoriesSection';
 import { PricingSection } from './components/PricingSection';
 import { ResultCard } from './components/ResultCard';
-import { AdSenseUnit } from './components/AdSenseUnit';
 import { CookieConsent } from './components/CookieConsent';
 import { LegalModal, LegalTabType } from './components/LegalModal';
 import { GuidePage } from './pages/GuidePage';
@@ -212,6 +211,16 @@ export default function App() {
       window.location.hash = '#perguntas-frequentes';
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Notifica o Google AdSense Auto Ads para reavaliar a página em transições de SPA
+    try {
+      if (typeof window !== 'undefined' && 'adsbygoogle' in window) {
+        ((window as unknown as { adsbygoogle: Array<Record<string, unknown>> }).adsbygoogle =
+          (window as unknown as { adsbygoogle: Array<Record<string, unknown>> }).adsbygoogle || []).push({});
+      }
+    } catch {
+      // silencioso para evitar interrupções caso o script ainda esteja carregando
+    }
   };
 
   useEffect(() => {
@@ -513,19 +522,8 @@ export default function App() {
       )}
 
       {currentPage === 'calculadora' && (
-        <>
-          {/* Bloco de Anúncio Google AdSense: Topo / Leaderboard Horizontal */}
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
-            <AdSenseUnit
-              slotId={import.meta.env.VITE_ADSENSE_SLOT_TOP || 'adsense-topo-leaderboard'}
-              format="horizontal"
-              label="Publicidade • Google AdSense"
-            />
-          </div>
-
-          {/* Conteúdo Principal em Grid Responsivo da Calculadora */}
-          <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-2 sm:pt-4" id="main-content">
-            {/* Banner didático quando o tutorial está ativo */}
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6" id="main-content">
+          {/* Banner didático quando o tutorial está ativo */}
             {isTutorialActive && (
               <div
                 id="banner-tutorial-ativo"
@@ -609,26 +607,9 @@ export default function App() {
                   onResetForNewCalculation={handleResetForNewCalculation}
                   onLoadTutorialExample={handleLoadValidationExample}
                 />
-
-                {/* Espaço Publicitário Responsivo na Barra Lateral */}
-                <AdSenseUnit
-                  slotId={import.meta.env.VITE_ADSENSE_SLOT_INLINE || 'adsense-sidebar-retangulo'}
-                  format="rectangle"
-                  label="Anúncio"
-                />
               </div>
             </div>
-
-            {/* Bloco de Anúncio Intermediário */}
-            <div className="mt-8">
-              <AdSenseUnit
-                slotId={import.meta.env.VITE_ADSENSE_SLOT_FOOTER || 'adsense-banner-meio'}
-                format="auto"
-                label="Publicidade"
-              />
-            </div>
           </main>
-        </>
       )}
 
       {/* Barra Compacta Inferior Fixa no Celular - Só na calculadora e quando os dados estiverem preenchidos */}

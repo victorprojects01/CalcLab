@@ -13,7 +13,6 @@ import {
   Sparkles,
   CheckCircle2,
 } from 'lucide-react';
-import { AdSenseUnit } from '../components/AdSenseUnit';
 
 interface FAQPageProps {
   onNavigateToCalculator: () => void;
@@ -133,15 +132,6 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onNavigateToCalculator }) => {
           <HelpCircle className="w-3.5 h-3.5 text-blue-600" />
           <span>Central de Dúvidas Técnicas</span>
         </div>
-      </div>
-
-      {/* Bloco de Anúncio Superior (AdSense) */}
-      <div className="mb-8">
-        <AdSenseUnit
-          slotId={import.meta.env.VITE_ADSENSE_SLOT_TOP || 'adsense-faq-topo'}
-          format="horizontal"
-          label="Publicidade • Google AdSense"
-        />
       </div>
 
       {/* Cabeçalho da Página */}
@@ -291,15 +281,6 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onNavigateToCalculator }) => {
         )}
       </div>
 
-      {/* Bloco de Anúncio Intermediário */}
-      <div className="my-10">
-        <AdSenseUnit
-          slotId={import.meta.env.VITE_ADSENSE_SLOT_INLINE || 'adsense-faq-meio'}
-          format="auto"
-          label="Publicidade"
-        />
-      </div>
-
       {/* Box de Contato se a dúvida não estiver aqui */}
       <div className="mt-8 p-6 rounded-2xl bg-gradient-to-r from-slate-50 to-blue-50/60 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
@@ -318,15 +299,6 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onNavigateToCalculator }) => {
           <Calculator className="w-4 h-4" />
           <span>Abrir Calculadora</span>
         </button>
-      </div>
-
-      {/* Bloco de Anúncio Rodapé */}
-      <div className="mt-10">
-        <AdSenseUnit
-          slotId={import.meta.env.VITE_ADSENSE_SLOT_FOOTER || 'adsense-faq-rodape'}
-          format="auto"
-          label="Publicidade"
-        />
       </div>
     </div>
   );
