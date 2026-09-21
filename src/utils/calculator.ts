@@ -244,9 +244,14 @@ export function calculatePrintCost(
     shippingCostPerPiece = pieceCount > 0 ? shippingVal / pieceCount : shippingVal;
   }
 
-  // Lucro = Custo × (Margem% / 100)
-  const profitPerPiece = unitCost * (profitMarginPercent / 100);
-  const profitTotal = printBatchTotal * (profitMarginPercent / 100);
+  // Base de custo operacional para cálculo do lucro (Custo fabril + Frete)
+  // O valor do frete entra na base de cálculo da margem de lucro
+  const baseCostPerPiece = unitCost + shippingCostPerPiece;
+  const baseCostTotal = printBatchTotal + shippingCostTotal;
+
+  // Lucro = (Custo + Frete) × (Margem% / 100)
+  const profitPerPiece = baseCostPerPiece * (profitMarginPercent / 100);
+  const profitTotal = baseCostTotal * (profitMarginPercent / 100);
 
   // Valor final de venda = Custo + Frete + Lucro
   const finalSalePricePerPiece = unitCost + shippingCostPerPiece + profitPerPiece;

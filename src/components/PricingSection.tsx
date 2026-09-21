@@ -196,7 +196,11 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
             onChange={(val) => handleFieldChange('profitMarginPercent', val)}
             placeholder="100"
             suffix="%"
-            helpText="Markup sobre o custo fabril: por exemplo, 100% de margem significa obter de lucro exatamente o mesmo valor gasto na produção."
+            helpText={
+              shippingNum > 0
+                ? "Markup sobre custo + frete: a porcentagem de lucro é aplicada sobre o valor do custo fabril somado ao frete."
+                : "Markup sobre o custo fabril: por exemplo, 100% de margem significa obter de lucro exatamente o mesmo valor investido na produção."
+            }
           />
 
           {/* Presets de Margem */}
@@ -311,6 +315,11 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
                   </div>
                   <span className="text-xs font-semibold text-slate-700 block">
                     Lucro Líquido (+{result.profitMarginPercent}%)
+                    {result.shippingCostTotal > 0 && (
+                      <span className="block text-[10px] text-slate-400 font-normal">
+                        sobre custo + frete
+                      </span>
+                    )}
                   </span>
                   <div className="text-lg font-extrabold text-emerald-700 mt-0.5">
                     {formatCurrency(result.profitPerPiece)}
