@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" width="100%" height="100%">
+  <!-- Outer Rounded Frame -->
+  <rect x="6" y="6" width="52" height="52" rx="12" stroke="#2563EB" stroke-width="5" fill="none" />
+
+  <!-- Top Gantry Bar -->
+  <rect x="15" y="12" width="34" height="4" rx="1.5" fill="#2563EB" />
+  
+  <!-- Extruder Mount & Hotend -->
+  <rect x="29.5" y="16" width="5" height="6" fill="#2563EB" />
+  <rect x="22" y="22" width="20" height="11" rx="2" fill="#2563EB" />
+  <rect x="28" y="26" width="8" height="4" fill="#0F172A" />
+  <polygon points="30,33 34,33 32,37" fill="#2563EB" />
+
+  <!-- Print Bed -->
+  <rect x="15" y="47" width="34" height="4" rx="1.5" fill="#2563EB" />
+
+  <!-- Printed Object on Bed -->
+  <path d="M22 47 L25 40 L32 38 L39 40 L42 47 Z" fill="#2563EB" />
+  <!-- Internal piece details -->
+  <circle cx="28.5" cy="44" r="1.2" fill="#0F172A" />
+  <circle cx="35.5" cy="44" r="1.2" fill="#0F172A" />
+</svg>
