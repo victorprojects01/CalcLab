@@ -11,8 +11,10 @@ import {
 } from 'lucide-react';
 import { AccessoryItem, AccessoryUnit, SavedAccessoryTemplate } from '../types';
 import { NumericInput } from './NumericInput';
-import { formatCurrency, parseLocalNumber } from '../utils/calculator';
-import { IconAcessorios, IconAcabamento } from './icons/CalcLabIcons';
+import { parseLocalNumber } from '../utils/calculator';
+import { IconAcessorios } from './icons/CalcLabIcons';
+import { useLanguage } from '../i18n/LanguageContext';
+import { translations } from '../i18n/translations';
 
 interface AccessoriesSectionProps {
   items: AccessoryItem[];
@@ -29,11 +31,12 @@ export const AccessoriesSection: React.FC<AccessoriesSectionProps> = ({
   onSaveTemplate,
   onDeleteTemplate,
 }) => {
+  const { language, formatMoney } = useLanguage();
+  const t = translations[language];
   const [isExpanded, setIsExpanded] = useState<boolean>(items.length > 0);
   const [showSavedTemplates, setShowSavedTemplates] = useState(false);
   const [justSavedId, setJustSavedId] = useState<string | null>(null);
 
-  // Adicionar novo item
   const handleAddNew = () => {
     setIsExpanded(true);
     const newItem: AccessoryItem = {
@@ -58,22 +61,30 @@ export const AccessoriesSection: React.FC<AccessoriesSectionProps> = ({
   };
 
   const handleUpdate = (id: string, updates: Partial<AccessoryItem>) => {
-    onUpdateItems(items.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+    const updated = items.map((item) => (item.id === id ? { ...item, ...updates } : item));
+    onUpdateItems(updated);
   };
 
-  const handleAddFromTemplate = (template: SavedAccessoryTemplate) => {
-    setIsExpanded(true);
+  const handleApplyTemplate = (template: SavedAccessoryTemplate) => {
     const newItem: AccessoryItem = {
-      ...template,
       id: `acc-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      name: template.name,
+      mode: template.mode,
+      unit: template.unit,
+      packagePrice: template.packagePrice,
+      packageQuantity: template.packageQuantity,
+      quantityPerPiece: template.quantityPerPiece,
+      directCostPerPiece: template.directCostPerPiece,
     };
     onUpdateItems([...items, newItem]);
+    setShowSavedTemplates(false);
+    setIsExpanded(true);
   };
 
-  const handleSaveToTemplates = (item: AccessoryItem) => {
+  const handleSaveAsTemplate = (item: AccessoryItem) => {
     if (!item.name.trim()) return;
     const template: SavedAccessoryTemplate = {
-      id: `template-${Date.now()}`,
+      id: `tpl-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       name: item.name.trim(),
       mode: item.mode,
       unit: item.unit,
@@ -87,363 +98,257 @@ export const AccessoriesSection: React.FC<AccessoriesSectionProps> = ({
     setTimeout(() => setJustSavedId(null), 2500);
   };
 
-  const getItemCostPerPiece = (item: AccessoryItem): number | null => {
+  const calculateItemCostPerPiece = (item: AccessoryItem): number => {
     if (item.mode === 'direct') {
-      return parseLocalNumber(item.directCostPerPiece);
+      return parseLocalNumber(item.directCostPerPiece) || 0;
     }
-    const price = parseLocalNumber(item.packagePrice);
-    const qtyPkg = parseLocalNumber(item.packageQuantity);
-    const qtyPiece = parseLocalNumber(item.quantityPerPiece);
-    if (price === null || qtyPkg === null || qtyPiece === null || qtyPkg <= 0) return null;
-    return (price / qtyPkg) * qtyPiece;
+    const pkgPrice = parseLocalNumber(item.packagePrice);
+    const pkgQty = parseLocalNumber(item.packageQuantity);
+    const perPiece = parseLocalNumber(item.quantityPerPiece);
+    if (pkgPrice && pkgQty && perPiece && pkgQty > 0) {
+      return (pkgPrice / pkgQty) * perPiece;
+    }
+    return 0;
   };
 
   return (
     <section
-      id="bloco-acessorios-acabamento"
-      className="bg-white rounded-2xl border-2 border-slate-300 shadow-sm transition-all overflow-hidden"
+      id="bloco-acessorios"
+      className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs transition-all overflow-hidden"
       aria-labelledby="heading-acessorios"
     >
-      {/* Cabeçalho do Bloco 3 */}
       <div className="p-5 md:p-6 border-b border-slate-100 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center p-1.5 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center p-1.5 shrink-0 text-indigo-600">
             <IconAcessorios className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
-                Bloco 3
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
+                {t.block3Badge}
               </span>
               <h2 id="heading-acessorios" className="text-base md:text-lg font-bold text-slate-900">
-                Acabamento e acessórios
+                {t.block3Title}
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Seção opcional para argolas, ímãs, parafusos, cola, tinta ou embalagens
+              {t.block3Subtitle}
             </p>
           </div>
         </div>
 
-        {items.length > 0 && (
-          <button
-            type="button"
-            id="btn-toggle-accessories"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 rounded-xl transition-colors min-h-[44px]"
-            aria-expanded={isExpanded}
-          >
-            <span>{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
-            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-        )}
-      </div>
-
-      {/* Estado Inicial Recolhido (quando não há itens adicionados) */}
-      {!isExpanded && items.length === 0 && (
-        <div id="convite-acessorios" className="p-5 md:p-6 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-slate-800">
-              Vai usar argolas, ímãs, tinta ou outros materiais?
-            </p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Adicione os componentes extras para calcular o custo exato de cada unidade pronta para venda.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {savedTemplates.length > 0 && (
-              <button
-                type="button"
-                id="btn-ver-salvos-inicial"
-                onClick={() => {
-                  setIsExpanded(true);
-                  setShowSavedTemplates(true);
-                }}
-                className="px-3.5 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 rounded-xl min-h-[44px] flex items-center gap-1.5 transition-colors"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                <span>Salvos ({savedTemplates.length})</span>
-              </button>
-            )}
-
+        <div className="flex items-center gap-2">
+          {items.length > 0 && (
             <button
               type="button"
-              id="btn-add-accessory-main"
-              onClick={handleAddNew}
-              className="px-4 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5 min-h-[44px]"
+              id="btn-toggle-accessories"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors min-h-[44px] cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              <span>Adicionar acessório</span>
+              <span>{isExpanded ? (language === 'en' ? 'Collapse' : language === 'es' ? 'Plegar' : 'Recolher') : `${items.length} ${items.length === 1 ? (language === 'en' ? 'item' : 'item') : (language === 'en' ? 'items' : 'itens')}`}</span>
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
+          )}
+
+          <button
+            type="button"
+            id="btn-add-accessory"
+            onClick={handleAddNew}
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100/80 rounded-xl border border-indigo-200/80 transition-all min-h-[44px] shadow-2xs cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">{t.addAccessoryBtn}</span>
+            <span className="sm:hidden">{language === 'en' ? 'Add' : language === 'es' ? 'Añadir' : 'Adicionar'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Modelos rápidos */}
+      {savedTemplates.length > 0 && (
+        <div className="px-5 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between gap-2 overflow-x-auto">
+          <div className="flex items-center gap-2 shrink-0">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              {t.savedTemplatesBtn}:
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+            {savedTemplates.map((tpl) => (
+              <div key={tpl.id} className="flex items-center rounded-lg border border-slate-200 bg-white shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => handleApplyTemplate(tpl)}
+                  className="text-xs font-semibold text-slate-700 hover:text-indigo-600 px-2.5 py-1 transition-colors cursor-pointer"
+                >
+                  + {tpl.name}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDeleteTemplate(tpl.id)}
+                  className="text-slate-300 hover:text-rose-500 p-1 border-l border-slate-100 transition-colors cursor-pointer"
+                  title={t.deleteTemplateBtn}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Conteúdo Aberto */}
-      {isExpanded && (
-        <div className="p-5 md:p-6 space-y-5">
-          {/* Barra superior de ações dentro do bloco */}
-          <div className="flex flex-wrap items-center justify-between gap-2.5">
-            <p className="text-xs text-slate-600">
-              {items.length === 0
-                ? 'Nenhum acessório adicionado ainda.'
-                : `${items.length} ${items.length === 1 ? 'acessório configurado' : 'acessórios configurados'}:`}
-            </p>
+      {/* Estado Vazio */}
+      {items.length === 0 && (
+        <div className="p-8 text-center space-y-2">
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
+            {t.block3EmptyText}
+          </p>
+          <button
+            type="button"
+            onClick={handleAddNew}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline cursor-pointer"
+          >
+            <PackagePlus className="w-3.5 h-3.5" />
+            <span>{t.addAccessoryBtn}</span>
+          </button>
+        </div>
+      )}
 
-            <div className="flex items-center gap-2">
-              {savedTemplates.length > 0 && (
-                <button
-                  type="button"
-                  id="btn-toggle-saved-drawer"
-                  onClick={() => setShowSavedTemplates(!showSavedTemplates)}
-                  className="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 rounded-xl flex items-center gap-1.5 min-h-[44px] transition-colors"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Biblioteca ({savedTemplates.length})</span>
-                  {showSavedTemplates ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                </button>
-              )}
-
-              <button
-                type="button"
-                id="btn-add-another-accessory"
-                onClick={handleAddNew}
-                className="px-3.5 py-2 text-xs font-bold text-blue-600 bg-blue-50/80 hover:bg-blue-100/70 rounded-xl flex items-center gap-1.5 min-h-[44px] transition-colors"
+      {/* Lista de Itens */}
+      {items.length > 0 && isExpanded && (
+        <div className="p-5 md:p-6 space-y-4">
+          {items.map((item, index) => {
+            const costPerPiece = calculateItemCostPerPiece(item);
+            return (
+              <div
+                key={item.id}
+                className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 relative transition-all"
               >
-                <Plus className="w-4 h-4" />
-                <span>Adicionar outro item</span>
-              </button>
-            </div>
-          </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
+                  <div className="flex-1 w-full sm:w-auto flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-400 bg-white w-5 h-5 rounded-md flex items-center justify-center border border-slate-200 shrink-0">
+                      {index + 1}
+                    </span>
+                    <input
+                      type="text"
+                      placeholder={t.accNamePlaceholder}
+                      value={item.name}
+                      onChange={(e) => handleUpdate(item.id, { name: e.target.value })}
+                      className="w-full text-xs font-bold text-slate-800 bg-white px-2.5 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+                    />
+                  </div>
 
-          {/* Gaveta de biblioteca de itens salvos para reuso */}
-          {showSavedTemplates && savedTemplates.length > 0 && (
-            <div id="drawer-templates-salvos" className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Reutilizar item salvo
-                </span>
-                <span className="text-[11px] text-slate-400">Clique para incluir nesta peça</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                {savedTemplates.map((template) => (
-                  <div
-                    key={template.id}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200 text-xs hover:border-blue-400 transition-colors"
-                  >
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
                     <button
                       type="button"
-                      onClick={() => handleAddFromTemplate(template)}
-                      className="flex items-center gap-2 text-left flex-1 truncate pr-2 hover:text-blue-600"
+                      onClick={() => handleSaveAsTemplate(item)}
+                      disabled={!item.name.trim()}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-indigo-600 bg-white border border-slate-200 hover:border-indigo-200 transition-colors disabled:opacity-40 cursor-pointer"
+                      title={t.saveAsTemplateBtn}
                     >
-                      <IconAcabamento className="w-4 h-4 shrink-0 text-blue-600" />
-                      <div className="truncate">
-                        <span className="font-semibold text-slate-800 truncate block">{template.name}</span>
-                        <span className="text-[11px] text-slate-500">
-                          {template.mode === 'direct'
-                            ? `R$ ${template.directCostPerPiece} / peça`
-                            : `${template.quantityPerPiece} ${template.unit} de emb.`}
-                        </span>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onDeleteTemplate(template.id)}
-                      className="text-slate-400 hover:text-red-500 p-1.5 rounded-md min-w-[32px] min-h-[32px] flex items-center justify-center"
-                      title="Excluir da biblioteca"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Cards de Acessórios (otimizados para celular sem tabelas largas) */}
-          <div className="space-y-4" id="lista-cards-acessorios">
-            {items.map((item, index) => {
-              const costPerPiece = getItemCostPerPiece(item);
-
-              return (
-                <div
-                  key={item.id}
-                  id={`card-acessorio-${item.id}`}
-                  className="p-4 md:p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50/80 transition-all space-y-3.5"
-                >
-                  {/* Topo do Card: Número, Nome e Ações */}
-                  <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 pb-3">
-                    <div className="flex items-center gap-2.5 flex-1">
-                      <span className="w-6 h-6 rounded-lg bg-blue-100/70 text-blue-800 text-xs font-bold flex items-center justify-center shrink-0">
-                        {index + 1}
-                      </span>
-                      <input
-                        type="text"
-                        id={`input-nome-acc-${item.id}`}
-                        placeholder="Nome (ex: Argola de chaveiro, Ímã 8x2mm, Tinta)"
-                        value={item.name}
-                        onChange={(e) => handleUpdate(item.id, { name: e.target.value })}
-                        className="w-full text-sm font-semibold text-slate-900 bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-blue-600 focus:outline-none py-1"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {/* Salvar na biblioteca para reutilizar */}
-                      <button
-                        type="button"
-                        id={`btn-salvar-template-${item.id}`}
-                        onClick={() => handleSaveToTemplates(item)}
-                        disabled={!item.name.trim()}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1 min-h-[36px] transition-colors ${
-                          justSavedId === item.id
-                            ? 'text-emerald-700 bg-emerald-100'
-                            : 'text-slate-600 hover:text-blue-700 hover:bg-white bg-white/80 border border-slate-200 disabled:opacity-40'
-                        }`}
-                        title="Salvar na biblioteca para reutilizar em outras peças"
-                      >
-                        {justSavedId === item.id ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                            <span className="text-[11px] font-bold">Salvo</span>
-                          </>
-                        ) : (
-                          <>
-                            <BookmarkPlus className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline text-[11px]">Salvar item</span>
-                          </>
-                        )}
-                      </button>
-
-                      {/* Excluir item */}
-                      <button
-                        type="button"
-                        id={`btn-excluir-acc-${item.id}`}
-                        onClick={() => handleRemove(item.id)}
-                        className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 min-h-[36px] min-w-[36px] flex items-center justify-center transition-colors"
-                        title="Remover este acessório"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Alternância de Modalidade: Por embalagem vs "Já sei o custo por peça" */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <span className="text-slate-500 font-medium">Como você quer calcular:</span>
-                    <div className="inline-flex rounded-xl border border-slate-200 bg-white p-0.5 shadow-2xs">
-                      <button
-                        type="button"
-                        id={`btn-mode-pkg-${item.id}`}
-                        onClick={() => handleUpdate(item.id, { mode: 'package' })}
-                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                          item.mode === 'package'
-                            ? 'bg-blue-600 text-white shadow-2xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Calcular pela embalagem
-                      </button>
-                      <button
-                        type="button"
-                        id={`btn-mode-direct-${item.id}`}
-                        onClick={() => handleUpdate(item.id, { mode: 'direct' })}
-                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                          item.mode === 'direct'
-                            ? 'bg-blue-600 text-white shadow-2xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Já sei o custo por peça
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Formulário do Modo 1: Embalagem */}
-                  {item.mode === 'package' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-slate-200/80">
-                      <div className="flex flex-col gap-1.5">
-                        <label htmlFor={`select-unidade-${item.id}`} className="text-xs font-semibold text-slate-700">
-                          Unidade de medida
-                        </label>
-                        <select
-                          id={`select-unidade-${item.id}`}
-                          value={item.unit}
-                          onChange={(e) => handleUpdate(item.id, { unit: e.target.value as AccessoryUnit })}
-                          className="w-full rounded-xl border border-slate-300 bg-slate-50/60 focus:bg-white min-h-[44px] py-2 px-3 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600/25 focus:border-blue-600 shadow-2xs"
-                        >
-                          <option value="un">Unidade (un)</option>
-                          <option value="g">Gramas (g)</option>
-                          <option value="ml">Mililitros (ml)</option>
-                        </select>
-                      </div>
-
-                      <NumericInput
-                        id={`input-preco-emb-${item.id}`}
-                        label="Preço da embalagem"
-                        prefix="R$"
-                        placeholder="Ex: 25,00"
-                        value={item.packagePrice}
-                        onChange={(val) => handleUpdate(item.id, { packagePrice: val })}
-                        required
-                      />
-
-                      <NumericInput
-                        id={`input-qtd-emb-${item.id}`}
-                        label="Qtd na embalagem"
-                        suffix={item.unit}
-                        placeholder="Ex: 100"
-                        value={item.packageQuantity}
-                        onChange={(val) => handleUpdate(item.id, { packageQuantity: val })}
-                        required
-                      />
-
-                      <NumericInput
-                        id={`input-qtd-usada-${item.id}`}
-                        label="Qtd usada por peça"
-                        suffix={item.unit}
-                        placeholder="Ex: 1"
-                        value={item.quantityPerPiece}
-                        onChange={(val) => handleUpdate(item.id, { quantityPerPiece: val })}
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {/* Formulário do Modo 2: Já sei o custo por peça */}
-                  {item.mode === 'direct' && (
-                    <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 max-w-sm">
-                      <NumericInput
-                        id={`input-custo-direto-${item.id}`}
-                        label="Custo do material por peça"
-                        prefix="R$"
-                        placeholder="Ex: 0,75"
-                        value={item.directCostPerPiece}
-                        onChange={(val) => handleUpdate(item.id, { directCostPerPiece: val })}
-                        helpText="Ideal para tintas, lixas, cola instantânea ou fitas onde é mais prático estimar um valor fixo por peça."
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {/* Custo Calculado por Peça */}
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-slate-500 font-medium">Custo calculado deste acabamento:</span>
-                    <span className="text-sm font-bold text-slate-900">
-                      {costPerPiece !== null ? (
+                      {justSavedId === item.id ? (
                         <>
-                          <span className="text-blue-700">{formatCurrency(costPerPiece)}</span>
-                          <span className="text-slate-400 font-normal text-xs ml-1">/ peça</span>
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          <span className="text-emerald-600">{t.templateSavedSuccess}</span>
                         </>
                       ) : (
-                        <span className="text-slate-400 font-normal">Preencha os valores para calcular</span>
+                        <>
+                          <BookmarkPlus className="w-3 h-3" />
+                          <span>{t.saveAsTemplateBtn}</span>
+                        </>
                       )}
-                    </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(item.id)}
+                      className="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
+                      title={t.deleteTemplateBtn}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Seleção do Modo */}
+                <div className="flex items-center gap-3 text-xs">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`mode-${item.id}`}
+                      checked={item.mode === 'package'}
+                      onChange={() => handleUpdate(item.id, { mode: 'package' })}
+                      className="text-indigo-600"
+                    />
+                    <span className="font-medium text-slate-700">{t.accModePackage}</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`mode-${item.id}`}
+                      checked={item.mode === 'direct'}
+                      onChange={() => handleUpdate(item.id, { mode: 'direct' })}
+                      className="text-indigo-600"
+                    />
+                    <span className="font-medium text-slate-700">{t.accModeDirect}</span>
+                  </label>
+                </div>
+
+                {/* Campos do Modo Pacote */}
+                {item.mode === 'package' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1">
+                    <NumericInput
+                      id={`pkg-price-${item.id}`}
+                      label={t.accPackagePriceLabel}
+                      placeholder="Ex: 25.00"
+                      value={item.packagePrice}
+                      onChange={(val) => handleUpdate(item.id, { packagePrice: val })}
+                    />
+                    <NumericInput
+                      id={`pkg-qty-${item.id}`}
+                      label={t.accPackageQtyLabel}
+                      placeholder="100"
+                      value={item.packageQuantity}
+                      onChange={(val) => handleUpdate(item.id, { packageQuantity: val })}
+                      inputMode="numeric"
+                    />
+                    <NumericInput
+                      id={`piece-qty-${item.id}`}
+                      label={t.accQtyPerPieceLabel}
+                      placeholder="4"
+                      value={item.quantityPerPiece}
+                      onChange={(val) => handleUpdate(item.id, { quantityPerPiece: val })}
+                      inputMode="numeric"
+                    />
+                    <div className="flex flex-col justify-end p-2 bg-white rounded-xl border border-slate-200/90 text-right">
+                      <span className="text-[10px] text-slate-400 block">{t.accCalculatedPerPiece}</span>
+                      <strong className="text-xs sm:text-sm text-indigo-700 font-bold">
+                        {formatMoney(costPerPiece)}
+                      </strong>
+                    </div>
+                  </div>
+                )}
+
+                {/* Campos do Modo Direto */}
+                {item.mode === 'direct' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <NumericInput
+                      id={`direct-cost-${item.id}`}
+                      label={t.accDirectCostLabel}
+                      placeholder="Ex: 0.50"
+                      value={item.directCostPerPiece}
+                      onChange={(val) => handleUpdate(item.id, { directCostPerPiece: val })}
+                    />
+                    <div className="flex flex-col justify-end p-2 bg-white rounded-xl border border-slate-200/90 text-right">
+                      <span className="text-[10px] text-slate-400 block">{t.accCalculatedPerPiece}</span>
+                      <strong className="text-xs sm:text-sm text-indigo-700 font-bold">
+                        {formatMoney(costPerPiece)}
+                      </strong>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </section>

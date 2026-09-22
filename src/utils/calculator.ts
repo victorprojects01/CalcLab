@@ -29,25 +29,33 @@ export function parseLocalNumber(value: string | number | undefined | null): num
 }
 
 /**
- * Formata valor monetário no padrão Real Brasileiro (R$ 0,00)
+ * Formata valor monetário no padrão definido ou Real Brasileiro padrão
  */
-export function formatCurrency(value: number | null | undefined): string {
+export function formatCurrency(
+  value: number | null | undefined,
+  currencyCode: string = 'BRL',
+  locale: string = 'pt-BR'
+): string {
   if (value === null || value === undefined || isNaN(value)) {
-    return 'R$ --,--';
+    return '--.--';
   }
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  } catch {
+    return `${currencyCode} ${value.toFixed(2)}`;
+  }
 }
 
 /**
  * Formata números com precisão definida
  */
-export function formatNumber(value: number, decimals: number = 2): string {
-  return new Intl.NumberFormat('pt-BR', {
+export function formatNumber(value: number, decimals: number = 2, locale: string = 'pt-BR'): string {
+  return new Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(value);
@@ -292,8 +300,30 @@ export function calculatePrintCost(
 export function generateSummaryText(
   printer: PrinterConfig,
   print: PrintConfig,
-  result: CalculationResult
+  result: CalculationResult,
+  customFormatMoney?: (val: number | null | undefined) => string,
+  labels?: {
+    summaryTitle?: string;
+    summaryPieces?: string;
+    summaryTotalTime?: string;
+    summaryMaterial?: string;
+    summaryCostPerPiece?: string;
+    summaryBatchCost?: string;
+    summaryBreakdownTitle?: string;
+    summaryFilament?: string;
+    summaryEnergy?: string;
+    summaryDepreciation?: string;
+    summaryAccessories?: string;
+    summaryNoAccessories?: string;
+    summaryPricingSection?: string;
+    summaryCostProd?: string;
+    summaryShipping?: string;
+    summaryProfit?: string;
+    summaryFinalSale?: string;
+    summaryNote?: string;
+  }
 ): string {
+  const fmt = customFormatMoney || ((v) => formatCurrency(v));
   const projectName = print.projectName.trim() || 'Peça 3D';
   const hours = Math.floor(result.totalHours);
   const minutes = Math.round((result.totalHours - hours) * 60);
@@ -301,39 +331,38 @@ export function generateSummaryText(
 
   const accessoriesLines = result.accessoriesBreakdown.length > 0
     ? result.accessoriesBreakdown
-        .map(a => `  - ${a.name}: ${formatCurrency(a.costPerPiece)}/peça (${formatCurrency(a.totalCost)} total)`)
+        .map(a => `  - ${a.name}: ${fmt(a.costPerPiece)}/peça (${fmt(a.totalCost)} total)`)
         .join('\n')
-    : '  - Nenhum acessório adicional';
+    : `  - ${labels?.summaryNoAccessories || 'Nenhum acessório adicional'}`;
 
   let pricingBlock = '';
   if (result.hasPricingCalculated) {
     pricingBlock = `
-🏷️ PRECIFICAÇÃO E VENDA COMERCIAL:
-  • Custo de produção: ${formatCurrency(result.unitCost)}/peça (Total: ${formatCurrency(result.printBatchTotal)})
-  • Frete: ${formatCurrency(result.shippingCostPerPiece)}/peça (Total: ${formatCurrency(result.shippingCostTotal)})
-  • Lucro estimado (${result.profitMarginPercent}%): ${formatCurrency(result.profitPerPiece)}/peça (Total: ${formatCurrency(result.profitTotal)})
-  ⭐ PREÇO FINAL DE VENDA: ${formatCurrency(result.finalSalePricePerPiece)} / unidade (Total do pedido: ${formatCurrency(result.finalSalePriceTotal)})
+${labels?.summaryPricingSection || '🏷️ PRECIFICAÇÃO E VENDA COMERCIAL'}:
+  • ${labels?.summaryCostProd || 'Custo de produção'}: ${fmt(result.unitCost)}/peça (Total: ${fmt(result.printBatchTotal)})
+  • ${labels?.summaryShipping || 'Frete'}: ${fmt(result.shippingCostPerPiece)}/peça (Total: ${fmt(result.shippingCostTotal)})
+  • ${labels?.summaryProfit || 'Lucro estimado'} (${result.profitMarginPercent}%): ${fmt(result.profitPerPiece)}/peça (Total: ${fmt(result.profitTotal)})
+  ${labels?.summaryFinalSale || '⭐ PREÇO FINAL DE VENDA'}: ${fmt(result.finalSalePricePerPiece)} / unidade (Total: ${fmt(result.finalSalePriceTotal)})
 `;
   }
 
-  return `📊 Resumo de Custos - ${projectName}
+  return `${labels?.summaryTitle || '📊 Resumo de Custos'} - ${projectName}
 ------------------------------------------------
-Peças no lote: ${result.pieceCount} unidade(s)
-Tempo total: ${timeFormatted}
-Material: ${print.usedFilamentGrams}g (${print.filamentType || 'PLA'})
+${labels?.summaryPieces || 'Peças no lote'}: ${result.pieceCount}
+${labels?.summaryTotalTime || 'Tempo total'}: ${timeFormatted}
+${labels?.summaryMaterial || 'Material'}: ${print.usedFilamentGrams}g (${print.filamentType || 'PLA'})
 
-💰 CUSTO DE FABRICAÇÃO POR PEÇA: ${formatCurrency(result.unitCost)}
-📦 CUSTO TOTAL DO LOTE: ${formatCurrency(result.printBatchTotal)}
+💰 ${labels?.summaryCostPerPiece || 'CUSTO DE FABRICAÇÃO POR PEÇA'}: ${fmt(result.unitCost)}
+📦 ${labels?.summaryBatchCost || 'CUSTO TOTAL DO LOTE'}: ${fmt(result.printBatchTotal)}
 
-Detalhamento por peça:
-  • Filamento: ${formatCurrency(result.filamentCostPerPiece)} (total do lote: ${formatCurrency(result.filamentCostTotal)})
-  • Energia elétrica: ${formatCurrency(result.energyCostPerPiece)} (total do lote: ${formatCurrency(result.energyCostTotal)})
-  • Depreciação do equipamento: ${formatCurrency(result.depreciationCostPerPiece)} (total do lote: ${formatCurrency(result.depreciationCostTotal)})
-  • Acessórios e acabamento: ${formatCurrency(result.accessoriesCostPerPiece)} (total do lote: ${formatCurrency(result.accessoriesCostTotal)})
+${labels?.summaryBreakdownTitle || 'Detalhamento por peça'}:
+  • ${labels?.summaryFilament || 'Filamento'}: ${fmt(result.filamentCostPerPiece)} (total: ${fmt(result.filamentCostTotal)})
+  • ${labels?.summaryEnergy || 'Energia elétrica'}: ${fmt(result.energyCostPerPiece)} (total: ${fmt(result.energyCostTotal)})
+  • ${labels?.summaryDepreciation || 'Depreciação do equipamento'}: ${fmt(result.depreciationCostPerPiece)} (total: ${fmt(result.depreciationCostTotal)})
+  • ${labels?.summaryAccessories || 'Acessórios e acabamento'}: ${fmt(result.accessoriesCostPerPiece)} (total: ${fmt(result.accessoriesCostTotal)})
 
 Acessórios adicionados:
 ${accessoriesLines}
 ${pricingBlock}
-⚠️ Observação:
-Estimativa baseada nos dados informados.`;
+${labels?.summaryNote || '⚠️ Observação: Estimativa baseada nos dados informados.'}`;
 }

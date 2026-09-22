@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>https://calculadoraimpressao3d.com.br/</loc>
-    <lastmod>2026-09-21</lastmod>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://calculadoraimpressao3d.com.br/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://calculadoraimpressao3d.com.br/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://calculadoraimpressao3d.com.br/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://calculadoraimpressao3d.com.br/" />
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://calculadoraimpressao3d.com.br/#guia-precificacao</loc>
-    <lastmod>2026-09-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://calculadoraimpressao3d.com.br/#guia-completo</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://calculadoraimpressao3d.com.br/#guia-completo" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://calculadoraimpressao3d.com.br/?lang=en#guia-completo" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://calculadoraimpressao3d.com.br/?lang=es#guia-completo" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://calculadoraimpressao3d.com.br/#guia-completo" />
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://calculadoraimpressao3d.com.br/#perguntas-frequentes</loc>
-    <lastmod>2026-09-21</lastmod>
-    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://calculadoraimpressao3d.com.br/#perguntas-frequentes" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://calculadoraimpressao3d.com.br/?lang=en#perguntas-frequentes" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://calculadoraimpressao3d.com.br/?lang=es#perguntas-frequentes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://calculadoraimpressao3d.com.br/#perguntas-frequentes" />
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>

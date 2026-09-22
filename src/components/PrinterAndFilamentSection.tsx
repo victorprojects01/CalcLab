@@ -1,11 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Printer,
-  Zap,
-  Disc,
-  Info,
-  CheckCircle2,
-  AlertTriangle,
   ChevronDown,
   ChevronUp,
   SlidersHorizontal,
@@ -21,6 +15,8 @@ import {
   IconFilamento,
 } from './icons/CalcLabIcons';
 import { trackEvent } from '../utils/analytics';
+import { useLanguage } from '../i18n/LanguageContext';
+import { translations } from '../i18n/translations';
 
 interface PrinterAndFilamentSectionProps {
   printerConfig: PrinterConfig;
@@ -39,6 +35,8 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
   isExpanded,
   onToggleExpand,
 }) => {
+  const { language, currency } = useLanguage();
+  const t = translations[language];
   const [showReferenceModal, setShowReferenceModal] = useState(false);
 
   // Encontra a impressora selecionada no catálogo
@@ -52,7 +50,6 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
       return 'custom';
     }
     if (selectedCatalogItem && selectedCatalogItem.averagePowerWatts !== null) {
-      // Se o usuário alterou o valor para algo diferente do catálogo, é personalizado
       if (String(selectedCatalogItem.averagePowerWatts) === printerConfig.averagePowerWatts.trim()) {
         return 'catalog';
       }
@@ -70,7 +67,7 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
       });
       trackEvent('select_printer_model', {
         printer_id: 'custom',
-        printer_name: 'Customizada',
+        printer_name: 'Custom',
       });
       return;
     }
@@ -94,12 +91,12 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
     if (printerConfig.selectedPrinterId === 'custom') {
       const b = printerConfig.customBrand.trim();
       const m = printerConfig.customModel.trim();
-      return b || m ? `${b} ${m}`.trim() : 'Impressora Personalizada';
+      return b || m ? `${b} ${m}`.trim() : t.selectPrinterCustom;
     }
     if (selectedCatalogItem) {
       return `${selectedCatalogItem.brand} ${selectedCatalogItem.model}`;
     }
-    return 'Impressora não selecionada';
+    return t.selectPrinterLabel;
   };
 
   return (
@@ -117,14 +114,14 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-600 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
-                Bloco 2
+                {t.block2Badge}
               </span>
               <h2 id="heading-impressora-filamento" className="text-base md:text-lg font-bold text-slate-900">
-                Impressora e filamento
+                {t.block2Title}
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Custos operacionais fixos que ficam salvos para os próximos cálculos
+              {t.block2Subtitle}
             </p>
           </div>
         </div>
@@ -134,11 +131,11 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
           type="button"
           id="btn-toggle-config-block"
           onClick={onToggleExpand}
-          className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50/60 hover:bg-blue-50 rounded-xl transition-colors min-h-[44px] touch-manipulation"
+          className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50/60 hover:bg-blue-50 rounded-xl transition-colors min-h-[44px] touch-manipulation cursor-pointer"
           aria-expanded={isExpanded}
         >
           <SlidersHorizontal className="w-3.5 h-3.5" />
-          <span>{isExpanded ? 'Recolher' : 'Editar configurações'}</span>
+          <span>{isExpanded ? t.block2HideBtn : t.block2ShowBtn}</span>
           {isExpanded ? <ChevronUp className="w-4 h-4 ml-0.5" /> : <ChevronDown className="w-4 h-4 ml-0.5" />}
         </button>
       </div>
@@ -153,22 +150,23 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
 
           <span className="bg-white px-3 py-1.5 rounded-lg border border-slate-200/80 shadow-2xs flex items-center gap-1.5">
             <IconEnergia className="w-4 h-4" />
-            <span>{printerConfig.averagePowerWatts ? `${printerConfig.averagePowerWatts} W` : 'Potência não informada'}</span>
+            <span>{printerConfig.averagePowerWatts ? `${printerConfig.averagePowerWatts} W` : '-- W'}</span>
             {powerSourceType === 'catalog' && (
               <span className="text-[10px] text-blue-700 bg-blue-50 font-medium px-1.5 py-0.5 rounded">
-                Ref. catálogo
+                Ref.
               </span>
             )}
           </span>
 
           <span className="bg-white px-3 py-1.5 rounded-lg border border-slate-200/80 shadow-2xs">
-            Energia: <strong className="text-slate-900">R$ {printerConfig.energyTariffPerKwh || '0,00'}/kWh</strong>
+            {language === 'en' ? 'Energy:' : language === 'es' ? 'Energía:' : 'Energia:'}{' '}
+            <strong className="text-slate-900">{currency.symbol} {printerConfig.energyTariffPerKwh || '0.00'}/kWh</strong>
           </span>
 
           <span className="bg-white px-3 py-1.5 rounded-lg border border-slate-200/80 shadow-2xs flex items-center gap-1.5">
             <IconFilamento className="w-4 h-4" />
             <span>
-              {printConfig.filamentType}: <strong className="text-slate-900">R$ {printConfig.spoolPrice || '0,00'}</strong> / {printConfig.spoolNetWeightGrams || '1000'}g
+              {printConfig.filamentType}: <strong className="text-slate-900">{currency.symbol} {printConfig.spoolPrice || '0.00'}</strong> / {printConfig.spoolNetWeightGrams || '1000'}g
             </span>
           </span>
         </div>
@@ -182,14 +180,14 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <IconImpressora3D className="w-5 h-5 text-blue-600" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                1. Equipamento e consumo
+                1. {language === 'en' ? 'Printer & Consumption' : language === 'es' ? 'Equipo y consumo' : 'Equipamento e consumo'}
               </h3>
             </div>
 
             {/* Seletor de impressora */}
             <div className="flex flex-col gap-1.5" id="container-select-printer">
               <label htmlFor="printer-select-main" className="text-xs font-semibold text-slate-700">
-                Marca e modelo da impressora
+                {t.selectPrinterLabel}
               </label>
               <select
                 id="printer-select-main"
@@ -198,23 +196,23 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
                 className="w-full rounded-xl border border-slate-300 bg-slate-50/60 focus:bg-white min-h-[44px] py-2.5 px-3.5 text-sm text-slate-800 font-medium hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/25 focus:border-blue-600 transition-colors shadow-2xs"
               >
                 <option value="" disabled>
-                  Selecione sua impressora...
+                  {t.selectPrinterLabel}...
                 </option>
-                <optgroup label="Modelos Populares Verificados">
+                <optgroup label={language === 'en' ? 'Popular Benchmarked Models' : language === 'es' ? 'Modelos Populares Verificados' : 'Modelos Populares Verificados'}>
                   {PRINTER_CATALOG.filter((p) => p.averagePowerWatts !== null).map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.brand} {p.model} ({p.averagePowerWatts}W médio)
+                      {p.brand} {p.model} ({p.averagePowerWatts}W avg)
                     </option>
                   ))}
                 </optgroup>
-                <optgroup label="Outros Modelos Cadastrados">
+                <optgroup label={language === 'en' ? 'Other Catalog Models' : language === 'es' ? 'Otros Modelos del Catálogo' : 'Outros Modelos Cadastrados'}>
                   {PRINTER_CATALOG.filter((p) => p.averagePowerWatts === null).map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.brand} {p.model} (Sem referência de consumo)
+                      {p.brand} {p.model}
                     </option>
                   ))}
                 </optgroup>
-                <option value="custom">Outra / Personalizada</option>
+                <option value="custom">{t.selectPrinterCustom}</option>
               </select>
             </div>
 
@@ -223,12 +221,12 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
                 <div className="flex flex-col gap-1">
                   <label htmlFor="custom-brand-input" className="text-xs font-semibold text-slate-700">
-                    Marca da máquina
+                    {t.customBrandLabel}
                   </label>
                   <input
                     id="custom-brand-input"
                     type="text"
-                    placeholder="Ex: Voron, Flsun, Two Trees..."
+                    placeholder={t.customBrandPlaceholder}
                     value={printerConfig.customBrand}
                     onChange={(e) => onPrinterChange({ customBrand: e.target.value })}
                     className="w-full rounded-xl border border-slate-300 bg-white min-h-[44px] py-2 px-3 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/25 focus:border-blue-600 shadow-2xs"
@@ -236,12 +234,12 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
                 </div>
                 <div className="flex flex-col gap-1">
                   <label htmlFor="custom-model-input" className="text-xs font-semibold text-slate-700">
-                    Modelo
+                    {t.customModelLabel}
                   </label>
                   <input
                     id="custom-model-input"
                     type="text"
-                    placeholder="Ex: 2.4, V400, CoreXY..."
+                    placeholder={t.customModelPlaceholder}
                     value={printerConfig.customModel}
                     onChange={(e) => onPrinterChange({ customModel: e.target.value })}
                     className="w-full rounded-xl border border-slate-300 bg-white min-h-[44px] py-2 px-3 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/25 focus:border-blue-600 shadow-2xs"
@@ -250,28 +248,22 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
               </div>
             )}
 
-            {/* Linha da Potência com Identificação da Origem e Botão "Ver referência" */}
+            {/* Linha da Potência */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label htmlFor="input-power-watts" className="text-xs font-semibold text-slate-700 flex items-center gap-1">
-                    <span>Potência média em impressão</span>
+                    <span>{t.avgPowerLabel}</span>
                     <span className="text-blue-600 font-bold">*</span>
                   </label>
-                  {/* Identificação da Origem */}
                   {powerSourceType === 'catalog' && (
                     <span className="text-[11px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                      Ref. de catálogo
+                      Ref.
                     </span>
                   )}
                   {powerSourceType === 'custom_override' && (
                     <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
-                      Valor personalizado
-                    </span>
-                  )}
-                  {powerSourceType === 'custom' && (
-                    <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
-                      Personalizado
+                      Custom
                     </span>
                   )}
                 </div>
@@ -291,29 +283,24 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
                   </span>
                 </div>
 
-                {/* Acesso a "Ver referência" ou alerta de ausência de teste */}
                 {selectedCatalogItem && selectedCatalogItem.averagePowerWatts !== null ? (
                   <div className="flex items-center justify-between pt-0.5">
                     <span className="text-[11px] text-slate-500">
-                      Consumo verificado: {selectedCatalogItem.averagePowerWatts}W
+                      {selectedCatalogItem.averagePowerWatts}W (bench)
                     </span>
                     <button
                       type="button"
                       id="btn-ver-referencia"
                       onClick={() => setShowReferenceModal(true)}
-                      className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline min-h-[28px] p-1"
+                      className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline min-h-[28px] p-1 cursor-pointer"
                     >
                       <BookOpen className="w-3 h-3" />
-                      Ver referência
+                      {language === 'en' ? 'Source info' : language === 'es' ? 'Ver fuente' : 'Ver referência'}
                     </button>
                   </div>
-                ) : selectedCatalogItem && selectedCatalogItem.averagePowerWatts === null ? (
-                  <p className="text-[11px] text-amber-700 bg-amber-50/80 p-2 rounded-lg border border-amber-200">
-                    Consumo de cruzeiro não disponível para este modelo. Insira a potência medida ou estimada (geralmente entre 100W e 150W para PLA).
-                  </p>
                 ) : (
                   <p className="text-[11px] text-slate-400">
-                    Consumo elétrico real com mesa e bico aquecidos.
+                    {t.avgPowerDesc}
                   </p>
                 )}
               </div>
@@ -322,23 +309,23 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
               <div className="space-y-4">
                 <NumericInput
                   id="input-printer-price"
-                  label="Preço pago pela impressora"
-                  prefix="R$"
-                  placeholder="Ex: 2200,00"
+                  label={t.printerPriceLabel}
+                  prefix={currency.symbol}
+                  placeholder="Ex: 350.00"
                   value={printerConfig.printerPurchasePrice}
                   onChange={(val) => onPrinterChange({ printerPurchasePrice: val })}
-                  helpText="Valor investido na impressora. O cálculo de depreciação distribui esse montante pelas horas estimadas de uso."
+                  helpText={t.printerPriceDesc}
                   required
                 />
 
                 <NumericInput
                   id="input-lifespan-hours"
-                  label="Vida útil estimada em horas"
-                  suffix="horas"
+                  label={t.lifespanLabel}
+                  suffix={t.hoursLabel.toLowerCase()}
                   placeholder="Ex: 5000"
                   value={printerConfig.lifespanHours}
                   onChange={(val) => onPrinterChange({ lifespanHours: val })}
-                  helpText="Distribui o valor da sua impressora pelas horas de uso. Não é garantia de fábrica, mas um critério financeiro (típico: 3.000 a 6.000 horas)."
+                  helpText={t.lifespanDesc}
                   required
                 />
               </div>
@@ -350,20 +337,20 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <IconEnergia className="w-5 h-5" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                2. Tarifa de energia elétrica
+                2. {t.energyTariffLabel}
               </h3>
             </div>
 
             <div className="max-w-md">
               <NumericInput
                 id="input-energy-tariff"
-                label="Tarifa de energia da sua fatura de luz"
-                prefix="R$"
+                label={t.energyTariffLabel}
+                prefix={currency.symbol}
                 suffix="/ kWh"
-                placeholder="Ex: 0,95"
+                placeholder="Ex: 0.15"
                 value={printerConfig.energyTariffPerKwh}
                 onChange={(val) => onPrinterChange({ energyTariffPerKwh: val })}
-                helpText="Valor do kWh com todos os impostos (ICMS, PIS, COFINS) e bandeiras tarifárias. No Brasil costuma variar entre R$ 0,80 e R$ 1,25 por kWh."
+                helpText={t.energyTariffDesc}
                 required
               />
             </div>
@@ -374,14 +361,14 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <IconFilamento className="w-5 h-5" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                3. Filamento padrão
+                3. {t.filamentTypeLabel}
               </h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5" id="container-filament-type">
                 <label htmlFor="select-filament-type" className="text-xs font-semibold text-slate-700">
-                  Tipo de material
+                  {t.filamentTypeLabel}
                 </label>
                 <select
                   id="select-filament-type"
@@ -393,118 +380,97 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
                   <option value="PETG">PETG</option>
                   <option value="ABS">ABS</option>
                   <option value="ASA">ASA</option>
-                  <option value="TPU">TPU (Flexível)</option>
-                  <option value="Outro">Outro</option>
+                  <option value="TPU">TPU</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
               <NumericInput
                 id="input-spool-price"
-                label="Preço do rolo de filamento"
-                prefix="R$"
-                placeholder="Ex: 95,00"
+                label={t.spoolPriceLabel}
+                prefix={currency.symbol}
+                placeholder="Ex: 22.00"
                 value={printConfig.spoolPrice}
                 onChange={(val) => onPrintChange({ spoolPrice: val })}
-                helpText="Preço pago no carretel fechado de filamento (incluindo eventual frete rateado)."
+                helpText={t.spoolPriceDesc}
                 required
               />
 
               <NumericInput
                 id="input-spool-net-weight"
-                label="Peso líquido do rolo"
-                suffix="gramas (g)"
+                label={t.spoolWeightLabel}
+                suffix={language === 'en' ? 'grams (g)' : 'gramas (g)'}
                 placeholder="1000"
                 value={printConfig.spoolNetWeightGrams}
                 onChange={(val) => onPrintChange({ spoolNetWeightGrams: val })}
-                helpText="Peso real do plástico sem o carretel plástico vazio (a maioria dos rolos no mercado contém 1000g / 1kg)."
+                helpText={t.spoolWeightDesc}
                 required
               />
             </div>
           </div>
 
-          {/* Rodapé do bloco expandido com botão de concluir */}
+          {/* Rodapé do bloco expandido */}
           <div className="pt-2 flex items-center justify-between border-t border-slate-100">
             <p className="text-xs text-slate-400">
-              Alterações salvas automaticamente no armazenamento local.
+              {language === 'en' ? 'Values saved in local browser storage.' : language === 'es' ? 'Valores guardados en tu navegador.' : 'Alterações salvas automaticamente no armazenamento local.'}
             </p>
             <button
               type="button"
               id="btn-recolher-config"
               onClick={onToggleExpand}
-              className="px-4 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors min-h-[44px]"
+              className="px-4 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors min-h-[44px] cursor-pointer"
             >
-              Concluir e recolher
+              {language === 'en' ? 'Done & Collapse' : language === 'es' ? 'Guardar y plegar' : 'Concluir e recolher'}
             </button>
           </div>
         </div>
       )}
 
-      {/* Modal de Referência Técnica de Consumo */}
+      {/* Modal de Referência Técnica */}
       {showReferenceModal && selectedCatalogItem && (
         <div
           id="modal-referencia-consumo"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="titulo-modal-referencia"
         >
           <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-xl p-6 relative">
             <button
               type="button"
               id="btn-fechar-modal-referencia"
               onClick={() => setShowReferenceModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg min-w-[36px] min-h-[36px] flex items-center justify-center"
-              aria-label="Fechar janela"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-2 text-blue-600 mb-2">
               <BookOpen className="w-5 h-5" />
-              <h3 id="titulo-modal-referencia" className="text-base font-bold text-slate-900">
-                Referência de consumo medida
+              <h3 className="text-base font-bold text-slate-900">
+                {t.benchSourceLabel}
               </h3>
             </div>
 
             <p className="text-xs text-slate-500 mb-4">
-              Detalhes do teste padronizado de potência média para{' '}
-              <strong>{selectedCatalogItem.brand} {selectedCatalogItem.model}</strong>.
+              <strong>{selectedCatalogItem.brand} {selectedCatalogItem.model}</strong>
             </p>
 
             <div className="space-y-3 text-xs bg-slate-50 p-4 rounded-xl border border-slate-100">
               <div>
-                <span className="text-slate-400 block mb-0.5">Potência média em regime:</span>
+                <span className="text-slate-400 block mb-0.5">{t.avgPowerLabel}:</span>
                 <span className="text-base font-bold text-slate-900">
                   {selectedCatalogItem.averagePowerWatts} Watts
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block mb-0.5">Fonte da medição:</span>
-                <span className="font-semibold text-slate-800">{selectedCatalogItem.referenceSource}</span>
+                <span className="text-slate-400 block mb-0.5">{t.benchSourceLabel}:</span>
+                <span className="text-slate-700">{selectedCatalogItem.referenceSource}</span>
               </div>
               <div>
-                <span className="text-slate-400 block mb-0.5">Data / Período:</span>
-                <span className="font-medium text-slate-700">{selectedCatalogItem.referenceDate}</span>
+                <span className="text-slate-400 block mb-0.5">{t.benchTestedAt}:</span>
+                <span className="text-slate-700">{selectedCatalogItem.referenceDate}</span>
               </div>
-              <div>
-                <span className="text-slate-400 block mb-0.5">Condições do teste:</span>
-                <span className="text-slate-700 leading-relaxed">{selectedCatalogItem.testConditions}</span>
-              </div>
-            </div>
-
-            <p className="text-[11px] text-slate-500 mt-4 leading-relaxed">
-              O consumo real pode variar conforme a velocidade de impressão, temperatura da mesa e temperatura ambiente. Você pode editar o valor a qualquer momento.
-            </p>
-
-            <div className="mt-5 text-right">
-              <button
-                type="button"
-                id="btn-entendi-modal-referencia"
-                onClick={() => setShowReferenceModal(false)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl min-h-[44px]"
-              >
-                Entendi
-              </button>
             </div>
           </div>
         </div>

@@ -3,11 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    <title>CalcLab - Quanto custa sua impressão 3D?</title>
-    <meta name="description" content="CalcLab: Calculadora de custo de produção para peças em impressoras 3D com energia, filamento, depreciação, acabamentos e preço final de venda." />
+    <title>Calculadora de Impressão 3D | Custo, Energia e Preço de Venda - CalcLab</title>
+    <meta name="description" content="Calculadora de impressão 3D online e grátis. Calcule quanto custa imprimir sua peça com filamento por grama, consumo de energia em kWh, depreciação de máquina e lucro justo." />
+    <meta name="keywords" content="calculadora de impressao 3d, quanto custa impressao 3d, 3d print cost calculator, calculadora de impresion 3d, calcular custo impressao 3d, preco impressao 3d, custo filamento grama, calcular energia impressora 3d, depreciacao impressora 3d, fdm orcamento impressao 3d, como cobrar impressao 3d" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href="https://calculadoraimpressao3d.com.br/" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Multilingual Alternate Hreflang Tags -->
+    <link rel="alternate" hreflang="pt-BR" href="https://calculadoraimpressao3d.com.br/" />
+    <link rel="alternate" hreflang="en" href="https://calculadoraimpressao3d.com.br/?lang=en" />
+    <link rel="alternate" hreflang="es" href="https://calculadoraimpressao3d.com.br/?lang=es" />
+    <link rel="alternate" hreflang="x-default" href="https://calculadoraimpressao3d.com.br/" />
 
     <!-- Google tag (gtag.js) - Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-V50HYR5VND"></script>
@@ -28,18 +35,21 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6239237268971394" crossorigin="anonymous"></script>
 
     <!-- OpenGraph Social Tags -->
-    <meta property="og:title" content="CalcLab - Quanto custa sua impressão 3D?" />
-    <meta property="og:description" content="CalcLab: Calculadora de custo de produção para peças em impressoras 3D com energia, filamento, depreciação, acabamentos e preço final de venda." />
+    <meta property="og:title" content="Calculadora de Impressão 3D | Custo e Preço de Venda - CalcLab" />
+    <meta property="og:description" content="Calcule o custo exato da sua impressão 3D: filamento por grama, consumo elétrico em kWh, desgaste da máquina e preço de venda com margem de lucro." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://calculadoraimpressao3d.com.br/" />
     <meta property="og:locale" content="pt_BR" />
-    <meta property="og:site_name" content="CalcLab" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:site_name" content="CalcLab - Calculadora de Impressão 3D" />
 
     <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CalcLab - Quanto custa sua impressão 3D?" />
-    <meta name="twitter:description" content="CalcLab: Calculadora de custo de produção para peças em impressoras 3D com energia, filamento, depreciação, acabamentos e preço final de venda." />
+    <meta name="twitter:title" content="Calculadora de Impressão 3D | Custo e Preço de Venda - CalcLab" />
+    <meta name="twitter:description" content="Descubra quanto cobrar por uma impressão 3D com precisão: matéria-prima, energia, depreciação, acabamento e lucro." />
 
-    <!-- Schema.org Structured Data (WebApplication + FAQPage) para indexação rica no Google -->
+    <!-- Schema.org Structured Data (WebApplication + FAQPage + HowTo) para indexação rica no Google -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -47,12 +57,13 @@
         {
           "@type": "WebApplication",
           "@id": "https://calculadoraimpressao3d.com.br/#webapp",
-          "name": "CalcLab",
+          "name": "CalcLab - Calculadora de Impressão 3D",
+          "alternateName": ["3D Print Cost Calculator", "Calculadora de Impresión 3D"],
           "url": "https://calculadoraimpressao3d.com.br/",
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "All",
-          "inLanguage": "pt-BR",
-          "description": "CalcLab: Calculadora de custo de produção para peças em impressoras 3D com energia, filamento, depreciação, acabamentos e preço final de venda.",
+          "inLanguage": ["pt-BR", "en-US", "es-ES"],
+          "description": "Calculadora online e gratuita para calcular o custo fabril exato e o preço final de venda de peças impressas em 3D FDM, considerando filamento, energia elétrica, depreciação de máquina, insumos e margem de lucro.",
           "offers": {
             "@type": "Offer",
             "price": "0",
@@ -65,10 +76,18 @@
           "mainEntity": [
             {
               "@type": "Question",
+              "name": "Como calcular o custo de uma impressão 3D?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O custo de impressão 3D é a soma de quatro elementos fundamentais: Custo do filamento gasto (gramas fatiadas × preço por grama) + Custo de energia elétrica (potência média da impressora em kW × horas de impressão × tarifa do kWh) + Depreciação da impressora (valor da máquina ÷ vida útil em horas) + Acessórios de acabamento e frete."
+              }
+            },
+            {
+              "@type": "Question",
               "name": "Por que a potência média consumida é menor que a potência nominal da fonte?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "A fonte suporta o pico inicial ao ligar bico e mesa juntos. Em regime estável, o PID chaveia em pulsos reduzindo a potência média efetiva para 90W a 140W."
+                "text": "A fonte suporta o pico inicial ao ligar bico e mesa juntos. Em regime estável de impressão, o controle térmico PID chaveia em pulsos, reduzindo a potência média efetiva para 90W a 140W em materiais como PLA."
               }
             },
             {
@@ -76,7 +95,7 @@
               "name": "Como descubro o valor do kWh cobrado na minha conta de luz?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Divida o valor total em reais da fatura de energia elétrica pelos kWh consumidos no mês, incluindo impostos e bandeiras tarifárias."
+                "text": "Divida o valor total em reais da fatura de energia elétrica pelos kWh consumidos no mês, incluindo impostos (ICMS, PIS, COFINS), iluminação pública e adicionais de bandeiras tarifárias."
               }
             },
             {
@@ -84,8 +103,57 @@
               "name": "Qual é a vida útil estimada de uma impressora 3D FDM?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Em média de 5.000 a 6.000 horas para impressoras domésticas intermediárias antes de manutenções maiores."
+                "text": "Em média de 5.000 a 6.000 horas para impressoras domésticas intermediárias (como Ender 3 ou Neptune) e até 8.000 a 10.000 horas para impressoras CoreXY fechadas ou industriais."
               }
+            },
+            {
+              "@type": "Question",
+              "name": "O fatiador 3D já inclui o peso dos suportes e infill?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim! Fatiadores como Cura, Bambu Studio, OrcaSlicer e PrusaSlicer calculam todo o plástico extrudado: paredes, preenchimento, suportes, saia (skirt), borda (brim) e torres de purga. Use sempre a pesagem do software fatiador."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Qual margem de lucro devo cobrar na impressão 3D?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Para peças exclusivas e prototipagem sob encomenda, recomenda-se margens de 100% a 250% sobre o custo de produção. Para lotes em escala ou atacado (brindes e chaveiros), margens de 50% a 100% são usuais."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "HowTo",
+          "@id": "https://calculadoraimpressao3d.com.br/#como-calcular",
+          "name": "Como Calcular o Custo de uma Peça Impressa em 3D",
+          "description": "Passo a passo para orçar e precificar peças na manufatura aditiva FDM sem prejuízo invisível.",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "name": "Consumo de Filamento",
+              "text": "Verifique no fatiador as gramas consumidas e multiplique pelo valor pago no carretel dividido pelo seu peso líquido."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Tempo e Energia Elétrica",
+              "text": "Multiplique o tempo de impressão pela potência média da impressora (em kW) e pelo valor do kWh da sua concessionária."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Depreciação e Desgaste",
+              "text": "Divida o valor de compra da impressora pela vida útil estimada (5.000h) e multiplique pela duração do trabalho."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Acessórios e Acabamentos",
+              "text": "Adicione o valor fracionado de parafusos, ímãs, argolas de chaveiro ou lixas necessárias para a peça."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Margem de Lucro e Frete",
+              "text": "Aplique a margem de lucro desejada sobre a base de custo e adicione o valor do envio se aplicável."
             }
           ]
         }
@@ -106,4 +174,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

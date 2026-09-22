@@ -1,8 +1,10 @@
 import React from 'react';
-import { Layers, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { PrintConfig } from '../types';
 import { NumericInput } from './NumericInput';
 import { IconFilamento } from './icons/CalcLabIcons';
+import { useLanguage } from '../i18n/LanguageContext';
+import { translations } from '../i18n/translations';
 
 interface YourPrintSectionProps {
   config: PrintConfig;
@@ -13,6 +15,9 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
   config,
   onChange,
 }) => {
+  const { language } = useLanguage();
+  const t = translations[language];
+
   return (
     <section
       id="bloco-sua-impressao"
@@ -31,14 +36,14 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-extrabold text-blue-700 uppercase tracking-wider bg-blue-100/90 px-2.5 py-0.5 rounded-md border border-blue-200">
-                Bloco Principal de Preenchimento
+                {t.block1Badge}
               </span>
             </div>
             <h2 id="heading-sua-impressao" className="text-lg md:text-xl font-bold text-slate-900 tracking-tight mt-0.5">
-              Sua impressão
+              {t.block1Title}
             </h2>
             <p className="text-xs text-slate-600">
-              Preencha o tempo e o filamento indicados pelo seu fatiador para calcular o custo exato
+              {t.block1Subtitle}
             </p>
           </div>
         </div>
@@ -52,11 +57,10 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
         <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
         <div>
           <p className="font-semibold text-blue-900">
-            Copie o tempo e o consumo de filamento exibidos no seu fatiador (Cura, Bambu Studio, PrusaSlicer, Orca).
+            {t.slicerTipTitle}
           </p>
           <p className="text-blue-800/90 mt-0.5">
-            Tempo e gramas correspondem à <strong>impressão inteira na mesa</strong> (incluindo suportes e purga). A quantidade
-            abaixo serve para dividir o custo total igualmente entre as peças idênticas do mesmo lote.
+            {t.slicerTipDesc}
           </p>
         </div>
       </div>
@@ -66,14 +70,14 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
         <div className="flex flex-col gap-1.5" id="container-project-name">
           <div className="flex items-center justify-between">
             <label htmlFor="project-name" className="text-xs font-semibold text-slate-800">
-              Nome da peça ou projeto
+              {t.projectNameLabel}
             </label>
-            <span className="text-[11px] text-slate-400">Opcional</span>
+            <span className="text-[11px] text-slate-400">{language === 'en' ? 'Optional' : language === 'es' ? 'Opcional' : 'Opcional'}</span>
           </div>
           <input
             id="project-name"
             type="text"
-            placeholder="Ex: Chaveiro Articulado, Vaso Espiral, Suporte..."
+            placeholder={t.projectNamePlaceholder}
             value={config.projectName}
             onChange={(e) => onChange({ projectName: e.target.value })}
             className="w-full rounded-xl border border-slate-300 bg-slate-50/60 focus:bg-white min-h-[44px] py-2.5 px-3.5 text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/25 focus:border-blue-600 transition-all hover:border-slate-400 shadow-2xs"
@@ -85,7 +89,7 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
           {/* Tempo de impressão: horas e minutos lado a lado com rótulos claros */}
           <div className="sm:col-span-7 flex flex-col gap-1.5" id="container-tempo-impressao">
             <label className="text-xs font-semibold text-slate-800 flex items-center gap-1">
-              <span>Tempo de impressão</span>
+              <span>{t.printTimeLabel}</span>
               <span className="text-blue-600 font-bold">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2.5">
@@ -101,10 +105,10 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
                     onChange({ durationHours: clean });
                   }}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50/60 focus:bg-white min-h-[44px] py-2.5 pl-3.5 pr-14 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/25 focus:border-blue-600 hover:border-slate-400 transition-all shadow-2xs"
-                  aria-label="Horas de impressão"
+                  aria-label={t.hoursLabel}
                 />
                 <span className="absolute right-3 text-slate-500 text-xs font-semibold pointer-events-none bg-slate-100/90 px-1.5 py-0.5 rounded border border-slate-200">
-                  horas
+                  {t.hoursLabel.toLowerCase()}
                 </span>
               </div>
 
@@ -120,10 +124,10 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
                     onChange({ durationMinutes: clean });
                   }}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50/60 focus:bg-white min-h-[44px] py-2.5 pl-3.5 pr-14 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600/25 focus:border-blue-600 hover:border-slate-400 transition-all shadow-2xs"
-                  aria-label="Minutos de impressão"
+                  aria-label={t.minutesLabel}
                 />
                 <span className="absolute right-3 text-slate-500 text-xs font-semibold pointer-events-none bg-slate-100/90 px-1.5 py-0.5 rounded border border-slate-200">
-                  min
+                  {t.minutesLabel.toLowerCase().slice(0, 3)}
                 </span>
               </div>
             </div>
@@ -133,12 +137,12 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
           <div className="sm:col-span-5">
             <NumericInput
               id="input-used-grams"
-              label="Filamento utilizado"
-              suffix="gramas (g)"
+              label={t.usedFilamentLabel}
+              suffix={language === 'en' ? 'grams (g)' : 'gramas (g)'}
               placeholder="Ex: 85"
               value={config.usedFilamentGrams}
               onChange={(val) => onChange({ usedFilamentGrams: val })}
-              helpText="Peso total de plástico indicado no fatiador para a mesa inteira (já com suportes e saias)."
+              helpText={t.usedFilamentDesc}
               required
             />
           </div>
@@ -149,8 +153,8 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
           <div className="max-w-xs">
             <NumericInput
               id="input-piece-count"
-              label="Quantidade de peças iguais"
-              suffix="peça(s)"
+              label={t.pieceCountLabel}
+              suffix={t.pieceCountSuffix}
               placeholder="1"
               value={config.pieceCount}
               onChange={(val) => {
@@ -158,7 +162,7 @@ export const YourPrintSection: React.FC<YourPrintSectionProps> = ({
                 onChange({ pieceCount: clean });
               }}
               inputMode="numeric"
-              helpText="Se você colocou 1, 3 ou 5 peças idênticas para imprimir juntas na mesa, informe aqui para que o custo de energia, máquina e filamento seja rateado igualmente."
+              helpText={t.pieceCountDesc}
               required
             />
           </div>

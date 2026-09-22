@@ -1,6 +1,6 @@
 {
   "name": "CalcLab",
-  "description": "CalcLab - Quanto custa sua impressão 3D? Calculadora de custo de produção para peças em impressoras 3D com energia, filamento, depreciação, acabamentos e preço final de venda.",
+  "description": "Calculadora de Impressão 3D online e gratuita para calcular o custo exato da sua peça com filamento, consumo de energia elétrica em kWh, depreciação da máquina, acabamentos e preço final de venda com margem de lucro e frete.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
