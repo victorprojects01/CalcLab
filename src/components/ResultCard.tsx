@@ -24,6 +24,7 @@ import {
   IconAcessorios,
   IconLucro,
 } from './icons/CalcLabIcons';
+import { trackEvent } from '../utils/analytics';
 
 interface ResultCardProps {
   result: CalculationResult;
@@ -58,6 +59,13 @@ export const ResultCard: React.FC<ResultCardProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }
+
+    trackEvent('copy_summary', {
+      piece_count: result.pieceCount,
+      unit_cost: result.unitCost,
+      final_price_unit: result.finalSalePricePerPiece,
+      has_pricing: result.hasPricingCalculated,
+    });
   };
 
   // Estado antes do preenchimento das variáveis: o resultado do custo NÃO aparece

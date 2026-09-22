@@ -14,6 +14,7 @@ import { CalculationResult, PricingConfig } from '../types';
 import { formatCurrency, parseLocalNumber } from '../utils/calculator';
 import { NumericInput } from './NumericInput';
 import { IconLucro } from './icons/CalcLabIcons';
+import { trackEvent } from '../utils/analytics';
 
 interface PricingSectionProps {
   config: PricingConfig;
@@ -50,10 +51,16 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
 
   const handleSetMarginPreset = (value: string) => {
     handleFieldChange('profitMarginPercent', value);
+    trackEvent('select_margin_preset', {
+      margin_percent: value,
+    });
   };
 
   const handleSetShippingPreset = (value: string) => {
     handleFieldChange('shippingCost', value);
+    trackEvent('select_shipping_preset', {
+      shipping_cost: value,
+    });
   };
 
   const marginNum = parseLocalNumber(config.profitMarginPercent) ?? 0;

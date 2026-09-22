@@ -33,6 +33,7 @@ import { LegalModal, LegalTabType } from './components/LegalModal';
 import { GuidePage } from './pages/GuidePage';
 import { FAQPage } from './pages/FAQPage';
 import { CalcLabLogo } from './components/icons/CalcLabIcons';
+import { trackEvent, trackPageView } from './utils/analytics';
 
 export type ActivePage = 'calculadora' | 'guia' | 'faq';
 
@@ -197,6 +198,9 @@ export default function App() {
 
   const handleNavigate = (page: ActivePage) => {
     setCurrentPage(page);
+    let pagePath = '/';
+    let pageTitle = 'CalcLab - Calculadora 3D';
+
     if (page === 'calculadora') {
       if (window.location.hash) {
         try {
@@ -205,12 +209,24 @@ export default function App() {
           window.location.hash = '';
         }
       }
+      pagePath = '/';
+      pageTitle = 'CalcLab - Calculadora 3D';
     } else if (page === 'guia') {
       window.location.hash = '#guia-completo';
+      pagePath = '/#guia-completo';
+      pageTitle = 'Guia Completo de Custos - CalcLab';
     } else if (page === 'faq') {
       window.location.hash = '#perguntas-frequentes';
+      pagePath = '/#perguntas-frequentes';
+      pageTitle = 'Perguntas Frequentes (FAQ) - CalcLab';
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Google Analytics 4: Page View e evento de navegação
+    trackPageView(pagePath, pageTitle);
+    trackEvent('navigate_section', {
+      section_name: page,
+    });
 
     // Notifica o Google AdSense Auto Ads para reavaliar a página em transições de SPA
     try {
@@ -228,10 +244,13 @@ export default function App() {
       const hash = window.location.hash.toLowerCase();
       if (hash.includes('guia')) {
         setCurrentPage('guia');
+        trackPageView('/#guia-completo', 'Guia Completo de Custos - CalcLab');
       } else if (hash.includes('faq')) {
         setCurrentPage('faq');
+        trackPageView('/#perguntas-frequentes', 'Perguntas Frequentes (FAQ) - CalcLab');
       } else {
         setCurrentPage('calculadora');
+        trackPageView('/', 'CalcLab - Calculadora 3D');
       }
     };
     window.addEventListener('hashchange', handleHashChange);
@@ -248,6 +267,9 @@ export default function App() {
   const handleOpenLegal = (tab: LegalTabType) => {
     setLegalTab(tab);
     setIsLegalOpen(true);
+    trackEvent('open_legal_modal', {
+      tab_name: tab,
+    });
   };
 
   const mobileResultRef = useRef<HTMLDivElement>(null);
@@ -367,11 +389,13 @@ export default function App() {
     }));
     setIsTutorialActive(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    trackEvent('reset_calculation');
   };
 
   // Tutorial guiado com exemplo prático didático:
   // Mostra na prática como tempo, filamento, energia, acessórios, frete e margem compõem o preço de venda.
   const handleLoadValidationExample = () => {
+    trackEvent('load_tutorial_example');
     setPrinterConfig({
       selectedPrinterId: 'custom',
       customBrand: 'Impressora de Demonstração',

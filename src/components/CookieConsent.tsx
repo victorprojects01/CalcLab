@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Cookie, ShieldCheck, X } from 'lucide-react';
+import { updateGtagConsent } from '../utils/analytics';
 
 interface CookieConsentProps {
   onOpenPrivacyPolicy: () => void;
@@ -19,6 +20,8 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ onOpenPrivacyPolic
           setIsVisible(true);
         }, 1000);
         return () => clearTimeout(timer);
+      } else {
+        updateGtagConsent(consent === 'accepted');
       }
     } catch {
       // ignore
@@ -31,6 +34,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ onOpenPrivacyPolic
     } catch {
       // ignore
     }
+    updateGtagConsent(true);
     setIsVisible(false);
   };
 
@@ -40,6 +44,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({ onOpenPrivacyPolic
     } catch {
       // ignore
     }
+    updateGtagConsent(false);
     setIsVisible(false);
   };
 

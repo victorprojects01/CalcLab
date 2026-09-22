@@ -13,6 +13,7 @@ import {
   Sparkles,
   CheckCircle2,
 } from 'lucide-react';
+import { trackEvent } from '../utils/analytics';
 
 interface FAQPageProps {
   onNavigateToCalculator: () => void;
@@ -112,7 +113,15 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onNavigateToCalculator }) => {
   }, [selectedCategory, searchTerm]);
 
   const toggleFaq = (id: string) => {
-    setOpenFaqId((prev) => (prev === id ? null : id));
+    setOpenFaqId((prev) => {
+      const willOpen = prev !== id;
+      if (willOpen) {
+        trackEvent('view_faq_item', {
+          faq_id: id,
+        });
+      }
+      return willOpen ? id : null;
+    });
   };
 
   return (

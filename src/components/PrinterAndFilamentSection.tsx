@@ -20,6 +20,7 @@ import {
   IconEnergia,
   IconFilamento,
 } from './icons/CalcLabIcons';
+import { trackEvent } from '../utils/analytics';
 
 interface PrinterAndFilamentSectionProps {
   printerConfig: PrinterConfig;
@@ -67,6 +68,10 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
         customBrand: printerConfig.customBrand || '',
         customModel: printerConfig.customModel || '',
       });
+      trackEvent('select_printer_model', {
+        printer_id: 'custom',
+        printer_name: 'Customizada',
+      });
       return;
     }
 
@@ -77,6 +82,10 @@ export const PrinterAndFilamentSection: React.FC<PrinterAndFilamentSectionProps>
         customBrand: item.brand,
         customModel: item.model,
         averagePowerWatts: item.averagePowerWatts !== null ? String(item.averagePowerWatts) : '',
+      });
+      trackEvent('select_printer_model', {
+        printer_id: item.id,
+        printer_name: `${item.brand} ${item.model}`,
       });
     }
   };
