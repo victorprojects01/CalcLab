@@ -46,6 +46,8 @@ export const ResultCard: React.FC<ResultCardProps> = ({
       summaryPieces: t.summaryPieces,
       summaryTotalTime: t.summaryTotalTime,
       summaryMaterial: t.summaryMaterial,
+      filamentWasteLabel: t.filamentWasteLabel,
+      filamentTotalLabel: t.filamentTotalLabel,
       summaryCostPerPiece: t.summaryCostPerPiece,
       summaryBatchCost: t.summaryBatchCost,
       summaryBreakdownTitle: t.summaryBreakdownTitle,
@@ -267,6 +269,12 @@ export const ResultCard: React.FC<ResultCardProps> = ({
                 <span className="font-semibold text-slate-800">{t.resultFilamentItem}</span>
                 <span className="text-[11px] text-slate-400 block">
                   {print.usedFilamentGrams}g {language === 'en' ? 'total' : language === 'es' ? 'total' : 'no total'}
+                </span>
+                <span className="text-[11px] text-slate-500 block">
+                  {t.filamentWasteLabel}: {result.filamentWasteGrams.toLocaleString(language, { maximumFractionDigits: 3 })} g
+                </span>
+                <span className="text-[11px] text-slate-500 block">
+                  {t.filamentTotalLabel}: {result.totalFilamentGrams.toLocaleString(language, { maximumFractionDigits: 3 })} g
                 </span>
               </div>
             </div>

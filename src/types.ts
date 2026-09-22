@@ -78,6 +78,8 @@ export interface CalculationResult {
   energyCostTotal: number;
   depreciationCostTotal: number;
   filamentCostTotal: number;
+  filamentWasteGrams: number;
+  totalFilamentGrams: number;
   accessoriesCostTotal: number;
   printBatchTotal: number; // energia + depreciação + filamento + acessórios totais
   // Por peça individual

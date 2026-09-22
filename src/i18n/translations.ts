@@ -49,6 +49,8 @@ export interface Translations {
   minutesLabel: string;
   usedFilamentLabel: string;
   usedFilamentDesc: string;
+  filamentWasteLabel: string;
+  filamentTotalLabel: string;
   pieceCountLabel: string;
   pieceCountDesc: string;
   pieceCountSuffix: string;
@@ -314,7 +316,9 @@ export const translations: Record<SupportedLanguage, Translations> = {
     hoursLabel: 'Horas',
     minutesLabel: 'Minutos',
     usedFilamentLabel: 'Filamento gasto informado no fatiador',
-    usedFilamentDesc: 'Gramas totais gastas na mesa (inclui suportes, saia e torre de purga)',
+    usedFilamentDesc: 'Gramas totais da mesa (inclui suportes, saia e torre de purga). Acrescentamos 5% de desperdício automaticamente.',
+    filamentWasteLabel: 'Desperdício (5%)',
+    filamentTotalLabel: 'Peso total com desperdício',
     pieceCountLabel: 'Quantidade de peças impressas na mesa',
     pieceCountDesc: 'Quantas unidades idênticas saem prontas ao final dessa impressão',
     pieceCountSuffix: 'unidade(s) na mesa',
@@ -421,7 +425,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
     guideSec1P2: 'Esse método ignora custos ocultos cruciais: a energia consumida pela mesa aquecida, a depreciação e manutenção da máquina, o filamento desperdiçado em suportes/purgas e o tempo investido em acabamento.',
     guidePillar1Title: 'Pilar 1: Matéria-Prima (Filamento por Grama)',
     guidePillar1Desc: 'O custo do filamento deve ser calculado com base no peso real fatiado no software (incluindo suportes, saias e torres de purga) e no valor pago pelo carretel com frete incluso.',
-    guidePillar1Formula: 'Custo Filamento = (Gramas Fatiadas ÷ Peso Líquido do Carretel em g) × Preço Total do Carretel',
+    guidePillar1Formula: 'Custo Filamento = (Gramas Fatiadas × 1,05 ÷ Peso Líquido do Carretel em g) × Preço Total do Carretel',
     guidePillar2Title: 'Pilar 2: Consumo Real de Energia Elétrica (kWh)',
     guidePillar2Desc: 'Uma impressora 3D não consome a potência máxima da fonte durante todo o trabalho. O aquecimento inicial gera um pico, mas em regime estável o controle PID reduz o consumo médio.',
     guidePillar2Formula: 'Custo Energia = (Potência Média em Watts ÷ 1000) × Horas de Impressão × Tarifa do kWh',
@@ -595,7 +599,9 @@ export const translations: Record<SupportedLanguage, Translations> = {
     hoursLabel: 'Hours',
     minutesLabel: 'Minutes',
     usedFilamentLabel: 'Filament used from slicer',
-    usedFilamentDesc: 'Total grams on build plate (includes supports, brim, skirt and purge)',
+    usedFilamentDesc: 'Total grams on build plate (includes supports, brim, skirt and purge). We automatically add 5% waste.',
+    filamentWasteLabel: 'Waste (5%)',
+    filamentTotalLabel: 'Total weight including waste',
     pieceCountLabel: 'Quantity of pieces printed on the plate',
     pieceCountDesc: 'How many identical units finish in this print run',
     pieceCountSuffix: 'unit(s) on plate',
@@ -702,7 +708,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
     guideSec1P2: 'This approach overlooks major overhead costs: electricity pulled by heated beds, printer depreciation, wear items, purge towers, support waste, and packaging.',
     guidePillar1Title: 'Pillar 1: Raw Material (Filament per Gram)',
     guidePillar1Desc: 'Calculate filament cost using sliced weight from your slicer (including supports and purge towers) divided by net spool weight and multiplied by spool purchase price.',
-    guidePillar1Formula: 'Filament Cost = (Sliced Grams ÷ Net Spool Grams) × Total Spool Price',
+    guidePillar1Formula: 'Filament Cost = (Sliced Grams × 1.05 ÷ Net Spool Grams) × Total Spool Price',
     guidePillar2Title: 'Pillar 2: True Electricity Consumption (kWh)',
     guidePillar2Desc: 'A 3D printer only draws peak wattage while heating initially. Once up to temperature, PID control pulses heating elements, drawing far less continuous power.',
     guidePillar2Formula: 'Power Cost = (Average Watts ÷ 1000) × Print Hours × Rate per kWh',
@@ -876,7 +882,9 @@ export const translations: Record<SupportedLanguage, Translations> = {
     hoursLabel: 'Horas',
     minutesLabel: 'Minutos',
     usedFilamentLabel: 'Filamento gastado según el laminador',
-    usedFilamentDesc: 'Gramos totales en la base (incluye soportes, balsa y torre de purga)',
+    usedFilamentDesc: 'Gramos totales en la base (incluye soportes, balsa y torre de purga). Añadimos un 5% de desperdicio automáticamente.',
+    filamentWasteLabel: 'Desperdicio (5%)',
+    filamentTotalLabel: 'Peso total con desperdicio',
     pieceCountLabel: 'Cantidad de piezas impresas en la base',
     pieceCountDesc: 'Cuántas unidades idénticas se fabrican en esta misma tirada',
     pieceCountSuffix: 'unidad(es) en la base',
@@ -983,7 +991,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
     guideSec1P2: 'Este método ignora costes críticos: la energía consumida por la cama caliente, la amortización de componentes, el filamento gastado en soportes y el acabado.',
     guidePillar1Title: 'Pilar 1: Materia Prima (Filamento por Gramo)',
     guidePillar1Desc: 'Calcula el filamento con los gramos laminados (incluyendo soportes, balsa y purgas), dividido por el peso neto y multiplicado por el precio del carrete con envío.',
-    guidePillar1Formula: 'Coste Filamento = (Gramos Laminados ÷ Peso Neto Bobina en g) × Precio Total Bobina',
+    guidePillar1Formula: 'Coste Filamento = (Gramos Laminados × 1,05 ÷ Peso Neto Bobina en g) × Precio Total Bobina',
     guidePillar2Title: 'Pillar 2: Consumo Eléctrico Real (kWh)',
     guidePillar2Desc: 'Una impresora 3D no consume la potencia máxima durante todo el trabajo. Tras calentar al inicio, el control PID reduce el consumo medio notablemente.',
     guidePillar2Formula: 'Coste Eléctrico = (Potencia Media en Vatios ÷ 1000) × Horas de Impresión × Tarifa kWh',

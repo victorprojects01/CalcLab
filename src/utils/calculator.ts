@@ -106,6 +106,8 @@ export function calculatePrintCost(
   }
 
   const usedGrams = parseLocalNumber(print.usedFilamentGrams);
+  const filamentWasteGrams = (usedGrams ?? 0) * 0.05;
+  const totalFilamentGrams = (usedGrams ?? 0) + filamentWasteGrams;
   if (usedGrams === null) {
     missingFields.push('Gramas totais utilizadas na impressão');
   }
@@ -197,6 +199,8 @@ export function calculatePrintCost(
       energyCostTotal: 0,
       depreciationCostTotal: 0,
       filamentCostTotal: 0,
+      filamentWasteGrams,
+      totalFilamentGrams,
       accessoriesCostTotal: 0,
       printBatchTotal: 0,
       energyCostPerPiece: 0,
@@ -224,8 +228,8 @@ export function calculatePrintCost(
   // Depreciação da impressão = preço da impressora ÷ vida útil estimada em horas × horas totais.
   const depreciationCostTotal = ((printerPrice as number) / (lifespanH as number)) * totalHours;
 
-  // Filamento da impressão = preço do rolo ÷ peso líquido do rolo em gramas × gramas utilizadas.
-  const filamentCostTotal = ((spoolPrice as number) / (spoolWeightGrams as number)) * (usedGrams as number);
+  // Inclui 5% de desperdício sobre o peso informado no fatiador.
+  const filamentCostTotal = ((spoolPrice as number) / (spoolWeightGrams as number)) * totalFilamentGrams;
 
   // Rateio para a quantidade de peças
   const energyCostPerPiece = energyCostTotal / pieceCount;
@@ -275,6 +279,8 @@ export function calculatePrintCost(
     energyCostTotal,
     depreciationCostTotal,
     filamentCostTotal,
+    filamentWasteGrams,
+    totalFilamentGrams,
     accessoriesCostTotal,
     printBatchTotal,
     energyCostPerPiece,
@@ -307,6 +313,8 @@ export function generateSummaryText(
     summaryPieces?: string;
     summaryTotalTime?: string;
     summaryMaterial?: string;
+    filamentWasteLabel?: string;
+    filamentTotalLabel?: string;
     summaryCostPerPiece?: string;
     summaryBatchCost?: string;
     summaryBreakdownTitle?: string;
@@ -351,6 +359,8 @@ ${labels?.summaryPricingSection || '🏷️ PRECIFICAÇÃO E VENDA COMERCIAL'}:
 ${labels?.summaryPieces || 'Peças no lote'}: ${result.pieceCount}
 ${labels?.summaryTotalTime || 'Tempo total'}: ${timeFormatted}
 ${labels?.summaryMaterial || 'Material'}: ${print.usedFilamentGrams}g (${print.filamentType || 'PLA'})
+${labels?.filamentWasteLabel || 'Desperdício (5%)'}: ${Number(result.filamentWasteGrams.toFixed(3))} g
+${labels?.filamentTotalLabel || 'Peso total com desperdício'}: ${Number(result.totalFilamentGrams.toFixed(3))} g
 
 💰 ${labels?.summaryCostPerPiece || 'CUSTO DE FABRICAÇÃO POR PEÇA'}: ${fmt(result.unitCost)}
 📦 ${labels?.summaryBatchCost || 'CUSTO TOTAL DO LOTE'}: ${fmt(result.printBatchTotal)}
